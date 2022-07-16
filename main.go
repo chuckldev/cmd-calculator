@@ -15,50 +15,50 @@ var rxOps = regexp.MustCompile(`[\-\+\/\*]`)
 
 // setup operations function map
 // this map will map a function ( i.e. 'Add', 'Subt', 'Mult', 'Div' ) to an operator ( i.e. '*', '+', '-', '/' )
-var opm map[string]func(float64,float64)float64
+var opm map[string]func(float64, float64) float64
 var opPrecendence []string
 
 //initialize operations map and operator precedence
 func init() {
-	opm = make(map[string]func(float64,float64)float64)
+	opm = make(map[string]func(float64, float64) float64)
 	opm[`*`] = Mult
 	opm[`/`] = Div
 	opm[`+`] = Add
 	opm[`-`] = Subt
 
-	opPrecendence = []string{`*`,`/`,`+`,`-`}
+	opPrecendence = []string{`*`, `/`, `+`, `-`}
 }
 
-func CheckErr( e error ) {
+func CheckErr(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
 
-func Add( op1, op2 float64) float64 {
+func Add(op1, op2 float64) float64 {
 	return op1 + op2
 }
 
-func Subt( op1, op2 float64 ) float64 {
+func Subt(op1, op2 float64) float64 {
 	return op1 - op2
 }
 
-func Mult( op1, op2 float64 ) float64 {
+func Mult(op1, op2 float64) float64 {
 	return op1 * op2
 }
 
-func Div( op1, op2 float64 ) float64 {
+func Div(op1, op2 float64) float64 {
 	var res float64
 	if op2 == 0 {
-		panic( "Cannot divide by Zero ( 0 )" )
+		panic("Cannot divide by Zero ( 0 )")
 	}
 	res = op1 / op2
 	return res
 }
 
 // check for parentheses
-func HasParens( s string ) bool {
-	return rxParens.MatchString( s )
+func HasParens(s string) bool {
+	return rxParens.MatchString(s)
 }
 
 // parse the indices of parentheses
@@ -94,7 +94,7 @@ func ParseExpressions(s string) [][]string {
 	parens := ParensIndex(s)
 	var res [][]string
 	expr := make([]string, 2)
-	expr[0] = s[parens[0]-1:parens[1]+1]
+	expr[0] = s[parens[0]-1 : parens[1]+1]
 	expr[1] = s[parens[0]:parens[1]]
 	res = append(res, expr)
 	return res
@@ -113,11 +113,11 @@ func Contains(ops []string, op string) int {
 
 // parse the operands fromt he expressions
 func ParseOperands(operands []string, idx int) (op1, op2 float64, ok bool) {
-	op1, err := strconv.ParseFloat( operands[idx], 64 )
+	op1, err := strconv.ParseFloat(operands[idx], 64)
 	if err != nil {
 		return math.NaN(), math.NaN(), false
 	}
-	op2, err = strconv.ParseFloat( operands[idx+1], 64 )
+	op2, err = strconv.ParseFloat(operands[idx+1], 64)
 	if err != nil {
 		return math.NaN(), math.NaN(), false
 	}
@@ -146,13 +146,13 @@ func EvaluateExpression(s string) float64 {
 				}
 				res := opm[oper](op1, op2)
 				oldExpr := fmt.Sprintf("%s%s%s", operands[idx], oper, operands[idx+1])
-				newExpr := strconv.FormatFloat( res, 'f', -1, 64 )
+				newExpr := strconv.FormatFloat(res, 'f', -1, 64)
 				s = strings.Replace(s, oldExpr, newExpr, -1)
 				break
 			}
 		}
 	}
-	res, err := strconv.ParseFloat( s, 64 )
+	res, err := strconv.ParseFloat(s, 64)
 	if err != nil {
 		panic(err)
 	}
@@ -168,7 +168,7 @@ func ReplaceParens(s *string, oldstr, newstr string) {
 
 func main() {
 	if len(os.Args) < 1 {
-		panic( "Calculator requires at least one argument ( string )." )
+		panic("Calculator requires at least one argument ( string ).")
 	}
 
 	// the problem inputted from cmd line
@@ -181,7 +181,7 @@ func main() {
 		expr := ParseExpressions(prob)
 		for i := range expr {
 			res := EvaluateExpression(expr[i][1])
-			ReplaceParens(&prob, expr[i][0], strconv.FormatFloat( res, 'f', -1, 64 ))
+			ReplaceParens(&prob, expr[i][0], strconv.FormatFloat(res, 'f', -1, 64))
 		}
 	}
 
